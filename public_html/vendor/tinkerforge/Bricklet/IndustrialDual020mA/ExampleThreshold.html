@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <head>
+        <title>Tinkerforge | JavaScript Example</title>
+    </head>
+    <body>
+        <div style="text-align:center;">
+            <h1>Industrial Dual 0-20mA Bricklet Threshold Example</h1>
+            <p>
+                <input value="localhost" id="host" type="text" size="20">:
+                <input value="4280" id="port" type="text" size="5">,
+                <input value="uid" id="uid" type="text" size="5">
+                <input value="Start Example" id="start" type="button" onclick="startExample();">
+            </p>
+            <p>
+                <textarea id="text" cols="80" rows="24" style="resize:none;"
+                          >Press "Start Example" to begin ...</textarea>
+            </p>
+        <div>
+        <script src="./Tinkerforge.js" type='text/javascript'></script>
+        <script type='text/javascript'>
+            var ipcon;
+            var textArea = document.getElementById("text");
+            function startExample() {
+                textArea.value = "";
+                var HOST = document.getElementById("host").value;
+                var PORT = parseInt(document.getElementById("port").value);
+                var UID = document.getElementById("uid").value;
+                if(ipcon !== undefined) {
+                    ipcon.disconnect();
+                }
+                ipcon = new Tinkerforge.IPConnection(); // Create IP connection
+                var dual020 = new Tinkerforge.BrickletIndustrialDual020mA(UID, ipcon); // Create device object
+                ipcon.connect(HOST, PORT,
+                    function(error) {
+                        textArea.value += 'Error: '+error+ '\n';
+                    }
+                ); // Connect to brickd
+                // Don't use device before ipcon is connected
+
+                ipcon.on(Tinkerforge.IPConnection.CALLBACK_CONNECTED,
+                    function(connectReason) {
+                        // Get threshold callbacks with a debounce time of 10 seconds (10000ms)
+                        dual020.setDebouncePeriod(10000);
+                        // Configure threshold (sensor 1) for "greater than 10mA" (unit is nA)
+                        dual020.setCurrentCallbackThreshold(1, '>', 10*1000*1000, 0);
+                    }
+                );
+                // Register threshold reached callback
+                dual020.on(Tinkerforge.BrickletIndustrialDual020mA.CALLBACK_CURRENT_REACHED,
+                    // Callback for current greater than 10mA
+                    function(sensor, current) {
+                        textArea.value += 'Current (sensor '+sensor+') is greater than 10mA: '+current/(1000*1000)+' mA';
+                        textArea.value += '\n';
+                        textArea.scrollTop = textArea.scrollHeight;
+                    }
+                );
+            }
+        </script>
+    </body>
+</html>
