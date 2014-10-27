@@ -27,7 +27,7 @@
             <div class="row">
 
                 <div class="col-md-2">
-                    <button class="btn btn-primary" ng-disabled="running" ng-click="startAmbient()">Start</button> 
+                    <button class="btn btn-primary" ng-disabled="running" ng-click="startIpConnection()">Start</button> 
                     <div class="form-group">
                         <label>Host:</label>
                         <input type="text" ng-model="host" class="form-control">
@@ -44,6 +44,7 @@
                         <label>Touch UID:</label>
                         <input type="text" ng-model="touchUid" class="form-control">
                     </div>
+					<span class="label label-danger">{{tinkerforgeError}}</span>
                 </div>
                 <div class="col-md-9">
                     <div class="col-md-4"><div>Touch Nr: {{touch.nr}}</div><div>Press '0' to clear chart</div></div>
